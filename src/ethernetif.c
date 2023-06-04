@@ -22,7 +22,7 @@ static void ethernetif_input(struct netif *netif);
  * @param netif the already initialized lwip network interface structure
  *			for this ethernetif
  */
-static void
+static int
 low_level_init(struct netif *netif)
 {
 	const struct enc28j60 *eth = netif->state;
@@ -58,7 +58,7 @@ low_level_init(struct netif *netif)
 	#endif /* LWIP_IPV6 && LWIP_IPV6_MLD */
 
 	/* Do whatever else is needed to initialize interface. */
-	enc28j60_init(eth);
+	return enc28j60_init(eth);
 }
 
 /**
@@ -262,7 +262,8 @@ ethernetif_init(struct netif *netif)
 	netif->linkoutput = low_level_output;
 
 	/* initialize the hardware */
-	low_level_init(netif);
+	if (low_level_init(netif))
+		return ERR_ARG;
 
 	return ERR_OK;
 }

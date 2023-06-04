@@ -5,17 +5,23 @@
 
 #include <pico/enc28j60/enc28j60.h>
 
-void
+int
 enc28j60_init(const struct enc28j60 *self)
 {
 	/* Soft reset */
 	enc28j60_write(self, ENC28J60_SRC | ENC28J60_SRC_ARG, NULL, 0);
 	sleep_ms(1); /* Errata issue 2 */
 
+	uint8_t prev_bank=enc28j60_switch_bank(self, 3);
+        unsigned char revid=1;
+        enc28j60_read(self, ENC28J60_EREVID, &revid, 1);
+	if (revid != ENC28J60_EREVID_B1 && revid != ENC28J60_EREVID_B4 && revid != ENC28J60_EREVID_B5 && revid != ENC28J60_EREVID_B7)
+		return -1;
+
 	/* LED setup */
 	enc28j60_write_phy(self, ENC28J60_PHLCON, 0x3476);
 
-	uint8_t prev_bank = enc28j60_switch_bank(self, 0);
+	enc28j60_switch_bank(self, 0);
 
 	/* MAC setup */
 	enc28j60_write_cr16(self, ENC28J60_ERXST, 0);  /* Start receive buffer in 0 as per errata issue 5 */
@@ -49,6 +55,7 @@ enc28j60_init(const struct enc28j60 *self)
 	enc28j60_bit_set(self, ENC28J60_ECON1, ENC28J60_RXEN);
 
 	enc28j60_switch_bank(self, prev_bank);
+	return 0;
 }
 
 void
@@ -469,3 +476,8 @@ const uint8_t ENC28J60_LATECOL = 0x10;
 const uint8_t ENC28J60_RXBUSY = 0x04;
 const uint8_t ENC28J60_TXABRT = 0x02;
 const uint8_t ENC28J60_CLKRDY = 0x01;
+
+const uint8_t ENC28J60_EREVID_B1 = 0x02;
+const uint8_t ENC28J60_EREVID_B4 = 0x04;
+const uint8_t ENC28J60_EREVID_B5 = 0x05;
+const uint8_t ENC28J60_EREVID_B7 = 0x06;

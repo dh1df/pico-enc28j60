@@ -62,7 +62,7 @@ struct enc28j60 {
 };
 
 /* Soft reset, initialize and enable packet reception. */
-void enc28j60_init(const struct enc28j60 *self);
+int enc28j60_init(const struct enc28j60 *self);
 
 /* Start the process of transmitting a single packet. */
 void enc28j60_transfer_init(const struct enc28j60 *self);
@@ -306,4 +306,8 @@ extern const uint8_t ENC28J60_RXBUSY;
 extern const uint8_t ENC28J60_TXABRT;
 extern const uint8_t ENC28J60_CLKRDY;
 
+extern const uint8_t ENC28J60_EREVID_B1;
+extern const uint8_t ENC28J60_EREVID_B4;
+extern const uint8_t ENC28J60_EREVID_B5;
+extern const uint8_t ENC28J60_EREVID_B7;
 #endif
